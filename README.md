@@ -5,13 +5,13 @@ Motor control library for duckling droids. It is true that with great torque com
 
 ### Goals ###
 
-- Safety Framework for Controlling High Torque Motors
-- Motor and Joint Description Stored in YAML (optional)
-- Ability to Safely Update All Joint Limits
-- Prevent Motors from Going Past Limits
-- All Joint Positions are Between 0.0 - 1.0
+- Safety Framework for High Torque
+- Joint Description in YAML
+- Joint Positions Between 0.0 - 1.0
 - Joints can be Inverted
-- Motion Capture on one Droid and Playback on Another
+- Safely Update Joint Limits
+- Secure Motors from Bad Commands
+- Motion Capture
 ---
 ### Supported Motors ###
 
