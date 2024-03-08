@@ -4,11 +4,6 @@
 
 /////////////////////////////////////////////
 
-static bool sVerbose;
-static bool sVeryVerbose;
-
-/////////////////////////////////////////////
-
 static PDRobot* sActiveRobot;
 static void Handler(int signo)
 {
@@ -26,6 +21,7 @@ bool saveConfiguration() {
 #ifdef USE_YAML
     return sRobotConfig.save(PDCONFIG_FILE);
 #endif
+    fprintf(stderr, "NO PERSISTENT STORAGE FOR MOTOR CONFIGURATION\n");
     return true;
 }
 
@@ -80,7 +76,6 @@ int main(int argc, const char* argv[]) {
     sActiveRobot = &robot;
     signal(SIGINT, Handler);
     setNonCanonicalMode(true);
-    uint64_t relaxAfter = 0;
     bool quit = false;
     bool firstTime = true;
 
@@ -92,17 +87,7 @@ int main(int argc, const char* argv[]) {
         robot.update();
 
         uint64_t now = currentTimeMillis();
-        if (relaxAfter && relaxAfter < now) {
-            robot.relax();
-            relaxAfter = 0;
-            if (player.stop()) {
-                printf("END PLAYBACK\n");
-            }
-            if (recording.stop()) {
-                printf("END RECORDING\n");
-            }
-            printf("RELAX\n");
-        } else if (recording.update()) {
+        if (recording.update()) {
             /* recording motion */
         } else if (player.update()) {
             /* playback */
@@ -115,7 +100,6 @@ int main(int argc, const char* argv[]) {
             case 'a':
                 printf("STAND\n");
                 robot.stand();
-                relaxAfter = 0;
                 break;
             case 'c':
                 robot.updateJointRange(sRobotConfig);
@@ -162,17 +146,14 @@ int main(int argc, const char* argv[]) {
                     robot.left.setPose(leftPose, 2000);
                     robot.right.setPose(rightPose, 2000);
                 }
-                relaxAfter = now + 30*1000;
-                break;
-            case 'v':
-                sVerbose = !sVerbose;
                 break;
             case -1:
                 break;
             default:
                 printf("RELAX\n");
                 robot.relax();
-                relaxAfter = 0;
+                player.stop();
+                recording.stop();
                 break;
         }
     }
@@ -180,191 +161,4 @@ int main(int argc, const char* argv[]) {
     robot.update();
     setNonCanonicalMode(false);
     return 0;
-#if 0
-#if defined(__x86_64__) || defined(_M_X64)
-    int pos = 0;
-    if (argc >= 2) {
-        pos = atoi(argv[1]);
-    }
-
-    PDSerialPort    serial("/dev/ttyUSB0");
-    PDActuator      hipPitch(MOTOR_ID_HIP_PITCH, "hip.pitch");
-    hipPitch.setRange(183, 29);
-    if (!hipPitch.update(serial)) {
-        fprintf(stderr, "Motor not responding\n");
-        exit(1);
-    }
-
-    signal(SIGINT, Handler);
-    setNonCanonicalMode(true);
-    printf("start position:%f [degrees:%f]\n", hipPitch.getPosition(), hipPitch.getDegrees());
-    hipPitch.setEasing(Easing::QuinticEaseInOut);
-    hipPitch.moveToPosition(0, 4000, float(pos)/100);
-    while (readKeyIfAvailable() == -1) {
-        printf("%f [%f]       \r", hipPitch.getPosition(), hipPitch.getDegrees());
-        hipPitch.update(serial);
-    }
-    printf("\n");
-    hipPitch.stop(serial);
-    printf("end position:%f [degrees:%f]\n", hipPitch.getPosition(), hipPitch.getDegrees());
-    setNonCanonicalMode(false);
-#elif defined(__x86_64__) || defined(_M_X64)
-    int pos = 0;
-    if (argc >= 2) {
-        pos = atoi(argv[1]);
-    }
-
-    PDSerialPort    serial("/dev/ttyUSB0");
-    PDActuator      knee(MOTOR_ID_KNEE, "knee");
-    knee.setRange(133, 222);
-    if (!knee.update(serial)) {
-        fprintf(stderr, "Motor not responding\n");
-        exit(1);
-    }
-    printf("start position:%f [degrees:%f]\n", knee.getPosition(), knee.getDegrees());
-    knee.setEasing(Easing::QuinticEaseInOut);
-    knee.moveToPosition(0, 4000, float(pos)/100);
-
-    signal(SIGINT, Handler);
-    setNonCanonicalMode(true);
-    uint64_t startTime = millis();
-    uint64_t stopTime = startTime + 2000;
-    while (readKeyIfAvailable() == -1) {    
-        knee.update(serial);
-    }
-    knee.stop(serial);
-    printf("end position:%f [degrees:%f]\n", knee.getPosition(), knee.getDegrees());
-    setNonCanonicalMode(false);
-#elif defined(__x86_64__) || defined(_M_X64)
-    int pos = 0;
-    if (argc >= 2) {
-        pos = atoi(argv[1]);
-    }
-
-    PDSerialPort    serial("/dev/ttyUSB0");
-    PDActuator      ankle(MOTOR_ID_ANKLE_PITCH, "ankle");
-    ankle.setRange(-76, -181);
-    if (!ankle.update(serial)) {
-        fprintf(stderr, "Motor not responding\n");
-        exit(1);
-    }
-    printf("start position:%f [degrees:%f]\n", ankle.getPosition(), ankle.getDegrees());
-    ankle.setEasing(Easing::QuinticEaseInOut);
-    ankle.moveToPosition(0, 1000, float(pos)/100);
-
-    signal(SIGINT, Handler);
-    setNonCanonicalMode(true);
-    uint64_t startTime = millis();
-    uint64_t stopTime = startTime + 2000;
-    while (readKeyIfAvailable() == -1) {    
-        ankle.update(serial);
-    }
-    ankle.stop(serial);
-    printf("end position:%f\n", ankle.getPosition());
-    setNonCanonicalMode(false);
-#else
-    int pos = 0;
-    if (argc >= 2) {
-        if (strcmp(argv[1], "-v") == 0) {
-            sVerbose = true;
-        }
-        else if (strcmp(argv[1], "-vv") == 0) {
-            sVeryVerbose = true;
-        }
-    }
-
-    PDLeg left("left", "/dev/ttyUSB0");
-    left.fAnklePitch.setRange(-76, -181);
-    left.fKnee.setRange(133, 222);
-    left.fHipPitch.setRange(-6, -135);
-
-    PDLeg right("right", "/dev/ttyUSB1");
-    if (!left.update() || !right.update()) {
-        fprintf(stderr, "Missing motors\n");
-        return 1;
-    }
-    signal(SIGINT, Handler);
-    setNonCanonicalMode(true);
-    uint64_t relaxAfter = 0;
-    bool quit = false;
-    bool firstTime = true;
-    LegPose leftPose;
-    LegPose rightPose;
-    while (!quit && left.update() && right.update()) {
-        if (relaxAfter && relaxAfter < millis()) {
-            printf("RELAX\n");
-            left.relax();
-            right.relax();
-            relaxAfter = 0;
-        }
-        switch (readKeyIfAvailable()) {
-            case 'q':
-                printf("QUIT\n");
-                quit = true;
-                break;
-            case 'a':
-                printf("STAND\n");
-                left.stand();
-                right.stand();
-                relaxAfter = 0;
-                break;
-            case 's':
-                if (firstTime) {
-                    printf("STAND FOR 30 SECONDS\n");
-                    left.getPose(leftPose);
-                    right.getPose(rightPose);
-                    firstTime = false;
-                } else {
-                    printf("STAND FOR 30 SECONDS\n");
-                    left.setPose(leftPose, 2000);
-                    right.setPose(rightPose, 2000);
-                }
-                left.stand();
-                right.stand();
-                relaxAfter = millis() + 30*1000;
-                break;
-            case 'v':
-                sVerbose = !sVerbose;
-                break;
-            case -1:
-                break;
-            default:
-                printf("RELAX\n");
-                left.relax();
-                right.relax();
-                relaxAfter = 0;
-                break;
-        }
-    }
-    left.relax();
-    right.relax();
-    left.update();
-    right.update();
-    setNonCanonicalMode(false);
-    return 0;
-
-    // if (pos == 1) {
-    //     leftAnkle.setAbsolutePosition(30);
-    //     leftKnee.setAbsolutePosition(-50);
-    //     leftHip.setAbsolutePosition(-100);
-    // } else {        
-    //     leftAnkle.setAbsolutePosition(0);
-    //     leftKnee.setAbsolutePosition(0);
-    //     leftHip.setAbsolutePosition(0);
-    // }
-    // while (readKeyIfAvailable() == -1) {
-    //     usleep(200);
-    //     leftAnkle.update();
-    //     leftKnee.update();
-    //     leftHip.update();
-    //     printf("leftKnee: %f %f %f        \r", leftAnkle.currentAngle(), leftKnee.currentAngle(), leftHip.currentAngle());
-    // }
-    // printf("\n");
-    // leftAnkle.stop();
-    // leftKnee.stop();
-    // leftHip.stop();
-    // setNonCanonicalMode(false);
-#endif
-    return 0;
-#endif
 }
