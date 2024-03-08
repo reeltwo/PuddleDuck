@@ -1,0 +1,5 @@
+#cmakedefine HAVE_CLOCK_GETTIME
+#cmakedefine HAVE_CLOCK_REALTIME
+#cmakedefine HAVE_CLOCK_MONOTONIC
+#cmakedefine HAVE_GETTIMEOFDAY
+#cmakedefine HAVE_FTIME

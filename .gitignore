@@ -1,0 +1,12 @@
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+.vs/
+.vscode
+.build
+build
+*.*.bak
+*.orig
+*.sublime-workspace
+._*
