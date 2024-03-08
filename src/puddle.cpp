@@ -41,7 +41,7 @@ bool loadConfiguration() {
 }
 
 static void usage(const char* argv0) {
-    fprintf(stderr, "Usage:\n%s: [-v] [-vv] [-f] [-h]\n", argv0);
+    fprintf(stderr, "Usage:\n%s: [-v] [-v:pos] [-v:move] [-v:motor] [-f] [-h]\n", argv0);
 }
 
 int main(int argc, const char* argv[]) {
