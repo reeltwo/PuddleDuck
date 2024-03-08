@@ -89,3 +89,108 @@ Here is the keyboard mapping for the 'puddle' example:
 - 's': First time save current stance and stand (stiffen leg joints). Next time assume first stance.
 - 'x': Move left ankle to position 0.0
 - 'z': Move left ankle to position 1.0
+
+### Robot configuration
+
+```yaml
+bus:
+  -
+    name: left_bus
+    type: GoMotor
+    adapter: /dev/ttyUSB0
+    version: 1
+  -
+    name: right_bus
+    type: GoMotor
+    adapter: /dev/ttyUSB1
+    version: 1
+neck:
+  bus: left_bus
+  id: 0
+  range: [.nan, .nan]
+  kp: 1.0
+  kd: 0.01
+  tau: 0
+  invert: false
+leg:
+  left:
+    bus: left_bus
+    ankle:
+      pitch:
+        id: 1
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+    knee:
+      pitch:
+        id: 2
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+    hip:
+      pitch:
+        id: 3
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+      roll:
+        id: 4
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+      yaw:
+        id: 5
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+  right:
+    bus: right_bus
+    ankle:
+      pitch:
+        id: 1
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+    knee:
+      pitch:
+        id: 2
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+    hip:
+      pitch:
+        id: 3
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+      roll:
+        id: 4
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+      yaw:
+        id: 5
+        range: [.nan, .nan]
+        kp: 1.0
+        kd: 0.01
+        tau: 0
+        invert: false
+```
