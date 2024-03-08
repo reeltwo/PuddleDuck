@@ -23,7 +23,7 @@ Motor control library for duckling droids. It is true that with great torque com
 ```bash
 git clone https://github.com/reeltwo/PuddleDuck
 cd PuddleDuck
-mkdir build && build
+mkdir build && cd build
 cmake .. && make
 ```
 
