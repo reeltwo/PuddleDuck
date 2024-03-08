@@ -2,12 +2,12 @@
 
 struct PDGoMotorCRC {
     PDGoMotorCRC() {
-        assert(sizeof(fHighCRC)/sizeof(fHighCRC) == sizeof(fLowCRC)/sizeof(fLowCRC));
+        assert(sizeof(fHighCRC)/sizeof(fHighCRC[0]) == sizeof(fLowCRC)/sizeof(fLowCRC[0]));
     }
 
     void setVersion(unsigned version) {
         fVersion = version - 1;
-        assert(fVersion < sizeof(fHighCRC)/sizeof(fHighCRC));
+        assert(fVersion < sizeof(fHighCRC)/sizeof(fHighCRC[0]));
     }
 
     uint16_t crc(void* bytes, size_t len, uint8_t lockMask = 0) const {
