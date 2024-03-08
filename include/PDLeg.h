@@ -9,7 +9,7 @@ struct PDLeg {
         static constexpr double CLOSE_ENOUGH = 1e-4;
         double  fPositions[5] = { NAN, NAN, NAN, NAN, NAN };
 
-        static constexpr size_t kNumActuators = sizeof(((Pose*)1)->fPositions)/sizeof(((Pose*)1)->fPositions[0]);
+        static constexpr size_t kNumActuators = sizeof(fPositions)/sizeof(fPositions[0]);
 
         static bool almostEqual(double a, double b, double tolerance = CLOSE_ENOUGH) {
             return std::abs(a - b) <= tolerance;
@@ -121,7 +121,7 @@ struct PDLeg {
     PDGoActuator&       fAnklePitch;
     bool                fHasHip;
 
-    static constexpr size_t kNumActuators = sizeof(((PDLeg*)1)->fActuator)/sizeof(((PDLeg*)1)->fActuator[0]);
+    static constexpr size_t kNumActuators = sizeof(fActuator)/sizeof(fActuator[0]);
 
     void report() {
         bool needBrackets = true;

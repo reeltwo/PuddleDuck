@@ -88,6 +88,9 @@ public:
         }
         tty.c_cc[VTIME] = centiseconds;
         tty.c_cc[VMIN] = minAvailable;
+        if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+            perror("tcsetattr fd");
+        }
     }
 
     bool send(PDGoMotorCmd* cmd) {
